@@ -361,9 +361,13 @@ int v4l2_scaler_setup(struct v4l2_scaler *scaler)
 		struct v4l2_scaler_buffer *buffer = &scaler->capture_buffers[i];
 
 		buffer->scaler = scaler;
-		buffer->planes_count =
-			scaler->capture_format.fmt.pix_mp.num_planes;
-fprintf(stderr, "capture planes %u\n", buffer->planes_count);
+
+		if (v4l2_type_mplane_check(scaler->capture_type))
+			buffer->planes_count =
+				scaler->capture_format.fmt.pix_mp.num_planes;
+		else
+			buffer->planes_count = 1;
+
 		ret = v4l2_scaler_buffer_setup(buffer, scaler->capture_type, i);
 		if (ret) {
 			fprintf(stderr, "Failed to setup capture buffer\n");
@@ -388,9 +392,13 @@ fprintf(stderr, "capture planes %u\n", buffer->planes_count);
 		struct v4l2_scaler_buffer *buffer = &scaler->output_buffers[i];
 
 		buffer->scaler = scaler;
-		buffer->planes_count =
-			scaler->output_format.fmt.pix_mp.num_planes;
-fprintf(stderr, "output planes %u\n", buffer->planes_count);
+
+		if (v4l2_type_mplane_check(scaler->output_type))
+			buffer->planes_count =
+				scaler->output_format.fmt.pix_mp.num_planes;
+		else
+			buffer->planes_count = 1;
+
 		ret = v4l2_scaler_buffer_setup(buffer, scaler->output_type, i);
 		if (ret) {
 			fprintf(stderr, "Failed to setup output buffer\n");
