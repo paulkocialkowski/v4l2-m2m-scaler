@@ -63,21 +63,21 @@ struct v4l2_scaler {
 	void *private;
 };
 
-int v4l2_scaler_prepare(struct v4l2_scaler *encoder);
-int v4l2_scaler_complete(struct v4l2_scaler *encoder);
-int v4l2_scaler_run(struct v4l2_scaler *encoder);
-int v4l2_scaler_start(struct v4l2_scaler *encoder);
-int v4l2_scaler_stop(struct v4l2_scaler *encoder);
-int v4l2_scaler_setup_defaults(struct v4l2_scaler *encoder);
+int v4l2_scaler_prepare(struct v4l2_scaler *scaler);
+int v4l2_scaler_complete(struct v4l2_scaler *scaler);
+int v4l2_scaler_run(struct v4l2_scaler *scaler);
+int v4l2_scaler_start(struct v4l2_scaler *scaler);
+int v4l2_scaler_stop(struct v4l2_scaler *scaler);
+int v4l2_scaler_setup_defaults(struct v4l2_scaler *scaler);
 int v4l2_scaler_setup_src_dimensions(struct v4l2_scaler *scaler,
 				     unsigned int width, unsigned int height);
 int v4l2_scaler_setup_dst_dimensions(struct v4l2_scaler *scaler,
 				     unsigned int width, unsigned int height);
-int v4l2_scaler_setup_format(struct v4l2_scaler *encoder, uint32_t format);
-int v4l2_scaler_setup(struct v4l2_scaler *encoder);
-int v4l2_scaler_teardown(struct v4l2_scaler *encoder);
-int v4l2_scaler_probe(struct v4l2_scaler *encoder);
-int v4l2_scaler_open(struct v4l2_scaler *encoder);
-void v4l2_scaler_close(struct v4l2_scaler *encoder);
+int v4l2_scaler_setup_format(struct v4l2_scaler *scaler, uint32_t format);
+int v4l2_scaler_setup(struct v4l2_scaler *scaler);
+int v4l2_scaler_teardown(struct v4l2_scaler *scaler);
+int v4l2_scaler_probe(struct v4l2_scaler *scaler);
+int v4l2_scaler_open(struct v4l2_scaler *scaler);
+void v4l2_scaler_close(struct v4l2_scaler *scaler);
 
 #endif

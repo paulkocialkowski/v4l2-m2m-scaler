@@ -59,7 +59,7 @@ int v4l2_poll(int video_fd, struct timeval *timeout)
 	FD_ZERO(&read_fds);
 	FD_SET(video_fd, &read_fds);
 
-	ret = select(video_fd + 1, NULL, NULL, &read_fds, timeout);
+	ret = select(video_fd + 1, &read_fds, NULL, NULL, timeout);
 	if (ret < 0)
 		return -errno;
 

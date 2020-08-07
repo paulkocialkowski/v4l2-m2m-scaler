@@ -72,7 +72,7 @@ int v4l2_scaler_run(struct v4l2_scaler *scaler)
 		return ret;
 
 	ret = v4l2_poll(scaler->video_fd, &timeout);
-	if (ret)
+	if (ret <= 0)
 		return ret;
 
 	do {
@@ -286,10 +286,7 @@ int v4l2_scaler_setup(struct v4l2_scaler *scaler)
 {
 	unsigned int src_width, src_height;
 	unsigned int dst_width, dst_height;
-	unsigned int input_width, output_height;
 	unsigned int buffers_count;
-	unsigned int output_size;
-	unsigned int capture_size;
 	uint32_t format;
 	unsigned int i;
 	int ret;
@@ -303,19 +300,10 @@ int v4l2_scaler_setup(struct v4l2_scaler *scaler)
 	dst_height = scaler->setup.dst_height;
 	format = scaler->setup.format;
 
-	/* XXX may be an issue */
-	output_size = capture_size = 0;
-
 	/* Capture format */
 
 	v4l2_format_setup_pixel(&scaler->capture_format, scaler->capture_type,
 				dst_width, dst_height, format);
-
-	if (v4l2_type_mplane_check(scaler->capture_type))
-		scaler->capture_format.fmt.pix_mp.plane_fmt[0].sizeimage =
-			capture_size;
-	else
-		scaler->capture_format.fmt.pix.sizeimage = capture_size;
 
 	ret = v4l2_format_try(scaler->video_fd, &scaler->capture_format);
 	if (ret) {
@@ -694,8 +682,8 @@ complete:
 
 int v4l2_scaler_open(struct v4l2_scaler *scaler)
 {
-	struct udev *udev;
-	struct udev_enumerate *enumerate;
+	struct udev *udev = NULL;
+	struct udev_enumerate *enumerate = NULL;
 	struct udev_list_entry *devices;
 	struct udev_list_entry *entry;
 	int ret;
@@ -707,16 +695,12 @@ int v4l2_scaler_open(struct v4l2_scaler *scaler)
 	scaler->video_fd = -1;
 
 	udev = udev_new();
-	if (!udev) {
-		ret = -1;
+	if (!udev)
 		goto error;
-	}
 
 	enumerate = udev_enumerate_new(udev);
-	if (!enumerate) {
-		ret = -1;
+	if (!enumerate)
 		goto error;
-	}
 
 	udev_enumerate_add_match_subsystem(enumerate, "media");
 	udev_enumerate_scan_devices(enumerate);
@@ -745,13 +729,11 @@ int v4l2_scaler_open(struct v4l2_scaler *scaler)
 
 	if (scaler->media_fd < 0) {
 		fprintf(stderr, "Failed to open scaler media device\n");
-		ret = -errno;
 		goto error;
 	}
 
 	if (scaler->video_fd < 0) {
 		fprintf(stderr, "Failed to open scaler video device\n");
-		ret = -errno;
 		goto error;
 	}
 
@@ -769,7 +751,15 @@ error:
 		scaler->video_fd = -1;
 	}
 
+	ret = -1;
+
 complete:
+	if (enumerate)
+		udev_enumerate_unref(enumerate);
+
+	if (udev)
+		udev_unref(udev);
+
 	return ret;
 }
 
